@@ -1,6 +1,6 @@
 # idrenew_code
 
-A new Flutter project.
+This is my Github repository for our mobile application named "IDRenew" as part of our academic requirements in the course Mobile App Development. This application uses Flutter SDK for its frontend and was done in Android Studio. Co-developed with my classmate, Mika Ysabelle Regalado.
 
 ## Getting Started
 
