@@ -233,22 +233,23 @@ class DisposeDetailsPage extends StatelessWidget {
 
                     const SizedBox(height: 12),
 
-                    Row(
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: () {},
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: const Color(0xFF10B981),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
+                        ElevatedButton(
+                          onPressed: () {},
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF10B981),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
                             ),
-                            child: const Text("Get Directions",
-                                style: TextStyle(color: Colors.white)),
+                          ),
+                          child: const Text(
+                            "Get Directions",
+                            style: TextStyle(color: Colors.white),
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(height: 6),
                         OutlinedButton(
                           onPressed: () {},
                           style: OutlinedButton.styleFrom(
@@ -257,11 +258,15 @@ class DisposeDetailsPage extends StatelessWidget {
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          child: const Text("View All Centers",
-                              style: TextStyle(color: Color(0xFF10B981))),
+                          child: const Text(
+                            "View All Centers",
+                            style: TextStyle(color: Color(0xFF10B981)),
+                          ),
                         ),
                       ],
                     ),
+
+
                   ],
                 ),
               ),

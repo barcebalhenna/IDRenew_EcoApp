@@ -9,6 +9,7 @@ class CategoryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final items = _getCategoryItems(title);
+    final suggestions = _getSuggestions(title);
 
     return Scaffold(
       appBar: AppBar(
@@ -25,9 +26,9 @@ class CategoryPage extends StatelessWidget {
               child: const Icon(Icons.recycling, color: Colors.white),
             ),
             const SizedBox(width: 8),
-            Text(
+            const Text(
               "IDRenew",
-              style: const TextStyle(
+              style: TextStyle(
                 color: Colors.black,
                 fontWeight: FontWeight.w700,
               ),
@@ -54,14 +55,15 @@ class CategoryPage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
-            // 🔹 Search Bar
+            // 🔹 Search Bar (still for typing)
             TextField(
               decoration: InputDecoration(
                 hintText: "Search $title...",
                 prefixIcon: const Icon(Icons.search, color: Colors.grey),
                 filled: true,
                 fillColor: const Color(0xFFF3F4F6),
-                contentPadding: const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
+                contentPadding:
+                const EdgeInsets.symmetric(vertical: 0, horizontal: 16),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -70,18 +72,59 @@ class CategoryPage extends StatelessWidget {
             ),
             const SizedBox(height: 10),
 
-            // 🔹 Suggested Keywords
+            // 🔹 Suggested Chips (direct navigation)
             Wrap(
               spacing: 8,
-              children: [
-                _buildSuggestionChip("Battery"),
-                _buildSuggestionChip("Screen"),
-                _buildSuggestionChip("Charger"),
-                _buildSuggestionChip("Keyboard"),
-              ],
+              children: suggestions.map((s) {
+                final item = items.firstWhere(
+                      (i) => (i["title"] as String)
+                      .toLowerCase()
+                      .contains(s.toLowerCase()),
+                  orElse: () => {}, // fallback if not found
+                );
+
+                return ActionChip(
+                  label: Text(s),
+                  backgroundColor: const Color(0xFFDCFCE7),
+                  labelStyle: const TextStyle(color: Color(0xFF10B981)),
+                  onPressed: () {
+                    if (item.isNotEmpty) {
+                      final isReusable = item["statusType"] == "reusable";
+                      if (isReusable) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => ScanDetailsPage(
+                              partName: item["title"] as String,
+                              status: item["status"] as String,
+                              statusColor: const Color(0xFF10B981),
+                              icon: item["icon"] as IconData,
+                            ),
+                          ),
+                        );
+                      } else {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DisposeDetailsPage(
+                              partName: item["title"] as String,
+                              status: item["status"] as String,
+                              icon: item["icon"] as IconData,
+                            ),
+                          ),
+                        );
+                      }
+                    } else {
+                      // fallback if chip doesn't match any item
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("No direct match for $s")),
+                      );
+                    }
+                  },
+                );
+              }).toList(),
             ),
             const SizedBox(height: 16),
-
 
             // 🔹 Items List
             Expanded(
@@ -103,20 +146,27 @@ class CategoryPage extends StatelessWidget {
                         width: 42,
                         height: 42,
                         decoration: BoxDecoration(
-                          color: (isReusable ? const Color(0xFF10B981) : Colors.red).withOpacity(0.1),
+                          color: (isReusable
+                              ? const Color(0xFF10B981)
+                              : Colors.red)
+                              .withOpacity(0.1),
                           borderRadius: BorderRadius.circular(10),
                         ),
                         alignment: Alignment.center,
                         child: Icon(
                           item["icon"] as IconData,
-                          color: isReusable ? const Color(0xFF10B981) : Colors.red,
+                          color: isReusable
+                              ? const Color(0xFF10B981)
+                              : Colors.red,
                         ),
                       ),
                       title: Text(item["title"] as String),
                       subtitle: Text(
                         item["status"] as String,
                         style: TextStyle(
-                          color: isReusable ? const Color(0xFF10B981) : Colors.red,
+                          color: isReusable
+                              ? const Color(0xFF10B981)
+                              : Colors.red,
                         ),
                       ),
                       trailing: const Icon(Icons.chevron_right),
@@ -146,7 +196,6 @@ class CategoryPage extends StatelessWidget {
                           );
                         }
                       },
-
                     ),
                   );
                 },
@@ -225,13 +274,20 @@ class CategoryPage extends StatelessWidget {
         return [];
     }
   }
-}
 
-Widget _buildSuggestionChip(String label) {
-  return Chip(
-    label: Text(label),
-    backgroundColor: const Color(0xFFDCFCE7),
-    labelStyle: const TextStyle(color: Color(0xFF10B981)),
-    padding: const EdgeInsets.symmetric(horizontal: 8),
-  );
+  // 🔹 Suggestions per category
+  List<String> _getSuggestions(String category) {
+    switch (category) {
+      case "Phone Parts":
+        return ["Battery", "Screen"];
+      case "Laptop Parts":
+        return ["RAM", "Keyboard"];
+      case "Components":
+        return ["Hard Drive", "Capacitor"];
+      case "Accessories":
+        return ["Charger", "Earphones"];
+      default:
+        return ["General"];
+    }
+  }
 }

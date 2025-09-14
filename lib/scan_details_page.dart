@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:youtube_player_iframe/youtube_player_iframe.dart';
 
-class ScanDetailsPage extends StatelessWidget {
+
+class ScanDetailsPage extends StatefulWidget {
   final String partName;
   final String status;
   final Color statusColor;
@@ -15,9 +17,15 @@ class ScanDetailsPage extends StatelessWidget {
   });
 
   @override
+  State<ScanDetailsPage> createState() => _ScanDetailsPageState();
+}
+
+class _ScanDetailsPageState extends State<ScanDetailsPage> {
+  bool _expanded = false;
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // ✅ AppBar with just branding
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -43,33 +51,34 @@ class ScanDetailsPage extends StatelessWidget {
         ),
       ),
 
-      // ✅ Body content
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ✅ Header row (moved phone battery info here)
+            // ✅ Header row
             Row(
               children: [
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: statusColor.withOpacity(0.1),
+                    color: widget.statusColor.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Icon(icon, color: statusColor, size: 32),
+                  child: Icon(widget.icon,
+                      color: widget.statusColor, size: 32),
                 ),
                 const SizedBox(width: 12),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      partName,
+                      widget.partName,
                       style: const TextStyle(
                           fontSize: 20, fontWeight: FontWeight.bold),
                     ),
-                    Text(status, style: TextStyle(color: statusColor)),
+                    Text(widget.status,
+                        style: TextStyle(color: widget.statusColor)),
                   ],
                 ),
               ],
@@ -79,29 +88,29 @@ class ScanDetailsPage extends StatelessWidget {
 
             // ✅ Status Card
             Card(
-              color: statusColor == const Color(0xFF10B981)
+              color: widget.statusColor == const Color(0xFF10B981)
                   ? const Color(0xFFDCFCE7)
                   : const Color(0xFFFEE2E2),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
               child: ListTile(
                 leading: Icon(
-                  statusColor == const Color(0xFF10B981)
+                  widget.statusColor == const Color(0xFF10B981)
                       ? Icons.check_circle
                       : Icons.error,
-                  color: statusColor,
+                  color: widget.statusColor,
                 ),
                 title: Text(
-                  statusColor == const Color(0xFF10B981)
+                  widget.statusColor == const Color(0xFF10B981)
                       ? "This part can be reused!"
                       : "This part should be disposed!",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: statusColor,
+                    color: widget.statusColor,
                   ),
                 ),
                 subtitle: Text(
-                  statusColor == const Color(0xFF10B981)
+                  widget.statusColor == const Color(0xFF10B981)
                       ? "Great for DIY projects and repairs"
                       : "Find nearby disposal centers",
                 ),
@@ -124,8 +133,8 @@ class ScanDetailsPage extends StatelessWidget {
                   children: [
                     const Text(
                       "Why It's Reusable",
-                      style:
-                      TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 12),
                     const _BulletPoint("Still functional"),
@@ -181,8 +190,8 @@ class ScanDetailsPage extends StatelessWidget {
                   children: [
                     const Text(
                       "How You Can Reuse This",
-                      style:
-                      TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                          fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 12),
                     Card(
@@ -190,8 +199,7 @@ class ScanDetailsPage extends StatelessWidget {
                       shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(12)),
                       child: const ListTile(
-                        leading:
-                        Icon(Icons.build, color: Color(0xFF10B981)),
+                        leading: Icon(Icons.build, color: Color(0xFF10B981)),
                         title: Text("DIY Projects"),
                         subtitle: Text(
                             "Power banks, LED lights, small electronics"),
@@ -205,8 +213,7 @@ class ScanDetailsPage extends StatelessWidget {
                         leading:
                         Icon(Icons.settings, color: Color(0xFF10B981)),
                         title: Text("Repair & Upgrade"),
-                        subtitle:
-                        Text("Replace in compatible devices"),
+                        subtitle: Text("Replace in compatible devices"),
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -238,21 +245,23 @@ class ScanDetailsPage extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  children: const [
-                    Text(
+                  children: [
+                    const Text(
                       "Learn How To Reuse",
                       style: TextStyle(
                           fontSize: 16, fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(height: 12),
-                    // Replace with Youtube player later
-                    _VideoPlaceholder(),
-                    SizedBox(height: 12),
-                    _BulletPoint("Battery replacement guide",
+                    const SizedBox(height: 12),
+                    // 🔹 Embedded YouTube player
+                    const VideoPlayerWidget(
+                      videoUrl: "https://www.youtube.com/watch?v=xvQ3RgetUEA",
+                    ),
+                    const SizedBox(height: 12),
+                    const _BulletPoint("Battery replacement guide",
                         icon: Icons.file_copy),
-                    _BulletPoint("DIY power bank project",
+                    const _BulletPoint("DIY power bank project",
                         icon: Icons.file_copy),
-                    _BulletPoint("Safety tips", icon: Icons.file_copy),
+                    const _BulletPoint("Safety tips", icon: Icons.file_copy),
                   ],
                 ),
               ),
@@ -260,7 +269,7 @@ class ScanDetailsPage extends StatelessWidget {
 
             const SizedBox(height: 20),
 
-            // ✅ If You Can't Reuse
+            // ✅ Expandable Disposal Section
             Card(
               elevation: 3,
               color: Colors.white,
@@ -268,28 +277,63 @@ class ScanDetailsPage extends StatelessWidget {
                   borderRadius: BorderRadius.circular(12)),
               child: Padding(
                 padding: const EdgeInsets.all(16),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                child: Column(
                   children: [
-                    Expanded(
-                      child: Column(
+                    InkWell(
+                      onTap: () {
+                        setState(() => _expanded = !_expanded);
+                      },
+                      child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Text(
-                            "If You Can't Reuse This Part",
-                            style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.bold),
+                        children: [
+                          const Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "If You Can't Reuse This Part",
+                                  style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold),
+                                ),
+                                SizedBox(height: 6),
+                                Text(
+                                  "We'll help you dispose of it safely...",
+                                  style: TextStyle(color: Colors.grey),
+                                ),
+                              ],
+                            ),
                           ),
-                          SizedBox(height: 6),
-                          Text(
-                            "We'll help you dispose of it safely...",
-                            style: TextStyle(color: Colors.grey),
+                          Icon(
+                            _expanded
+                                ? Icons.keyboard_arrow_up
+                                : Icons.keyboard_arrow_down,
+                            color: Colors.black54,
                           ),
                         ],
                       ),
                     ),
-                    const Icon(Icons.keyboard_arrow_down,
-                        color: Colors.black54),
+                    AnimatedCrossFade(
+                      firstChild: const SizedBox.shrink(),
+                      secondChild: Padding(
+                        padding: const EdgeInsets.only(top: 12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: const [
+                            _BulletPoint("Take it to a certified e-waste center",
+                                icon: Icons.delete),
+                            _BulletPoint("Do not throw in household trash",
+                                icon: Icons.warning),
+                            _BulletPoint("Check local recycling programs",
+                                icon: Icons.recycling),
+                          ],
+                        ),
+                      ),
+                      crossFadeState: _expanded
+                          ? CrossFadeState.showSecond
+                          : CrossFadeState.showFirst,
+                      duration: const Duration(milliseconds: 300),
+                    ),
                   ],
                 ),
               ),
@@ -323,22 +367,91 @@ class _BulletPoint extends StatelessWidget {
   }
 }
 
-// 🔹 Placeholder for YouTube tutorial
-class _VideoPlaceholder extends StatelessWidget {
-  const _VideoPlaceholder();
+// 🔹 YouTube video widget
+class VideoPlayerWidget extends StatefulWidget {
+  final String videoUrl;
+  const VideoPlayerWidget({Key? key, required this.videoUrl}) : super(key: key);
+
+  @override
+  State<VideoPlayerWidget> createState() => _VideoPlayerWidgetState();
+}
+
+class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
+  late YoutubePlayerController _controller;
+  String? _videoId;
+
+  @override
+  void initState() {
+    super.initState();
+    _videoId = _extractYoutubeId(widget.videoUrl);
+
+    if (_videoId != null && _videoId!.isNotEmpty) {
+      _controller = YoutubePlayerController.fromVideoId(
+        videoId: _videoId!,
+        autoPlay: false,
+        params: const YoutubePlayerParams(
+          showControls: true,
+          showFullscreenButton: true,
+        ),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.close();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 160,
-      decoration: BoxDecoration(
-        color: Colors.red,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: const Center(
-        child: Icon(Icons.play_circle_fill,
-            color: Colors.white, size: 48),
+    if (_videoId == null || _videoId!.isEmpty) {
+      return Container(
+        height: 160,
+        decoration: BoxDecoration(
+          color: Colors.red,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: const Center(
+          child: Icon(Icons.error, color: Colors.white, size: 48),
+        ),
+      );
+    }
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(12),
+      child: YoutubePlayerScaffold(
+        controller: _controller,
+        builder: (context, player) {
+          return AspectRatio(
+            aspectRatio: 16 / 9,
+            child: player,
+          );
+        },
       ),
     );
   }
+
+  String? _extractYoutubeId(String url) {
+    final uri = Uri.tryParse(url);
+    if (uri == null) return null;
+
+    if (uri.host.contains('youtu.be')) {
+      return uri.pathSegments.isNotEmpty ? uri.pathSegments.first : null;
+    }
+    if (uri.queryParameters.containsKey('v')) {
+      return uri.queryParameters['v'];
+    }
+    if (uri.pathSegments.contains('embed')) {
+      final index = uri.pathSegments.indexOf('embed');
+      if (index + 1 < uri.pathSegments.length) {
+        return uri.pathSegments[index + 1];
+      }
+    }
+    final match = RegExp(r'([A-Za-z0-9_-]{11})').firstMatch(url);
+    return match?.group(1);
+  }
 }
+
+
+

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'scan_details_page.dart';
+import 'dispose_details_page.dart';
 
 class SearchPage extends StatefulWidget {
   const SearchPage({super.key});
@@ -11,21 +13,52 @@ class _SearchPageState extends State<SearchPage> {
   final TextEditingController _controller = TextEditingController();
   String _query = "";
 
-  // Dummy suggestions
-  final List<String> suggestions = [
-    "Phone Battery",
-    "RAM Module",
-    "Hard Drive",
-    "Laptop Keyboard",
-    "Screen Display",
-    "Charging Cable",
+  // 🔹 Shared parts list (same structure as history/category)
+  final List<Map<String, dynamic>> _parts = [
+    {
+      "title": "Phone Battery",
+      "status": "✓ Reusable - 3 options found",
+      "statusType": "reusable",
+      "icon": Icons.battery_full,
+    },
+    {
+      "title": "RAM Module",
+      "status": "⚠ Dispose - 2 centers nearby",
+      "statusType": "dispose",
+      "icon": Icons.memory,
+    },
+    {
+      "title": "Hard Drive",
+      "status": "⚠ Dispose - 4 centers nearby",
+      "statusType": "dispose",
+      "icon": Icons.storage,
+    },
+    {
+      "title": "Laptop Keyboard",
+      "status": "✓ Reusable - 4 options found",
+      "statusType": "reusable",
+      "icon": Icons.keyboard,
+    },
+    {
+      "title": "Screen Display",
+      "status": "⚠ Dispose - cracked",
+      "statusType": "dispose",
+      "icon": Icons.phone_android,
+    },
+    {
+      "title": "Charging Cable",
+      "status": "✓ Reusable - 5 options found",
+      "statusType": "reusable",
+      "icon": Icons.cable,
+    },
   ];
 
   @override
   Widget build(BuildContext context) {
     // Filter results based on query
-    final results = suggestions
-        .where((s) => s.toLowerCase().contains(_query.toLowerCase()))
+    final results = _parts
+        .where((item) =>
+        item["title"].toLowerCase().contains(_query.toLowerCase()))
         .toList();
 
     return Scaffold(
@@ -57,7 +90,8 @@ class _SearchPageState extends State<SearchPage> {
                 prefixIcon: const Icon(Icons.search, color: Colors.grey),
                 filled: true,
                 fillColor: Colors.grey[100],
-                contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                contentPadding:
+                const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide.none,
@@ -87,15 +121,13 @@ class _SearchPageState extends State<SearchPage> {
         const SizedBox(height: 8),
         Wrap(
           spacing: 8,
-          children: suggestions.map((s) {
+          children: _parts.map((item) {
             return ActionChip(
               backgroundColor: const Color(0xFF10B981).withOpacity(0.1),
-              label: Text(s, style: const TextStyle(color: Color(0xFF10B981))),
+              label: Text(item["title"],
+                  style: const TextStyle(color: Color(0xFF10B981))),
               onPressed: () {
-                setState(() {
-                  _query = s;
-                  _controller.text = s;
-                });
+                _openDetails(item);
               },
             );
           }).toList(),
@@ -105,7 +137,7 @@ class _SearchPageState extends State<SearchPage> {
   }
 
   // 🔎 Search Results
-  Widget _buildResults(List<String> results) {
+  Widget _buildResults(List<Map<String, dynamic>> results) {
     if (results.isEmpty) {
       return const Center(
         child: Text("No results found",
@@ -115,6 +147,9 @@ class _SearchPageState extends State<SearchPage> {
     return ListView.builder(
       itemCount: results.length,
       itemBuilder: (context, index) {
+        final item = results[index];
+        final isReusable = item["statusType"] == "reusable";
+
         return Card(
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
           shape: RoundedRectangleBorder(
@@ -126,47 +161,51 @@ class _SearchPageState extends State<SearchPage> {
               width: 48,
               height: 48,
               decoration: BoxDecoration(
-                color: const Color(0xFF10B981).withOpacity(0.1),
+                color:
+                (isReusable ? const Color(0xFF10B981) : Colors.red)
+                    .withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: const Icon(Icons.memory, color: Color(0xFF10B981)),
+              child: Icon(item["icon"],
+                  color: isReusable ? const Color(0xFF10B981) : Colors.red),
             ),
-            title: Text(results[index]),
+            title: Text(item["title"]),
             subtitle: const Text("Tap to view details"),
             trailing: const Icon(Icons.chevron_right),
             onTap: () {
-              // Navigate to details page
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => PartDetailsPage(
-                    partName: results[index],
-                  ),
-                ),
-              );
+              _openDetails(item);
             },
           ),
         );
       },
     );
   }
-}
 
-// 🟡 Placeholder for detailed part page
-class PartDetailsPage extends StatelessWidget {
-  final String partName;
-  const PartDetailsPage({super.key, required this.partName});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(partName),
-      ),
-      body: Center(
-        child: Text("Details about $partName",
-            style: const TextStyle(fontSize: 18)),
-      ),
-    );
+  // 🟡 Navigate to details page depending on type
+  void _openDetails(Map<String, dynamic> item) {
+    if (item["statusType"] == "reusable") {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => ScanDetailsPage(
+            partName: item["title"],
+            status: item["status"],
+            statusColor: const Color(0xFF10B981),
+            icon: item["icon"],
+          ),
+        ),
+      );
+    } else {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => DisposeDetailsPage(
+            partName: item["title"],
+            status: item["status"],
+            icon: item["icon"],
+          ),
+        ),
+      );
+    }
   }
 }
