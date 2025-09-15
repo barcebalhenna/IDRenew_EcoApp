@@ -1,19 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'dashboard_page.dart';
 import 'scan_page.dart';
 import 'history_page.dart';
 import 'locations_page.dart';
+import 'onboarding_page.dart';
 
 final GlobalKey<_MainPageState> mainPageKey = GlobalKey<_MainPageState>();
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(const IDRenewApp());
+
+  final prefs = await SharedPreferences.getInstance();
+  //final hasSeenOnboarding = prefs.getBool('hasSeenOnboarding') ?? false;
+  bool hasSeenOnboarding = false;
+
+  runApp(IDRenewApp(showOnboarding: !hasSeenOnboarding));
 }
 
 class IDRenewApp extends StatelessWidget {
-  const IDRenewApp({super.key});
+  final bool showOnboarding;
+  const IDRenewApp({super.key, required this.showOnboarding});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +34,9 @@ class IDRenewApp extends StatelessWidget {
         primaryColor: const Color(0xFF10B981),
         scaffoldBackgroundColor: Colors.white,
       ),
-      home: MainPage(key: mainPageKey),
+      home: showOnboarding
+          ? const OnboardingPage()
+          : MainPage(key: mainPageKey),
     );
   }
 }
@@ -66,7 +77,7 @@ class _MainPageState extends State<MainPage> {
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         currentIndex: _selectedIndex,
-        selectedItemColor: Color(0xFF10B981),
+        selectedItemColor: const Color(0xFF10B981),
         unselectedItemColor: Colors.grey,
         onTap: _onItemTapped,
         items: const [

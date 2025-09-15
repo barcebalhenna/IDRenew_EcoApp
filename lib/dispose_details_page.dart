@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
+import 'main.dart';
 
 class DisposeDetailsPage extends StatelessWidget {
   final String partName;
@@ -194,7 +197,8 @@ class DisposeDetailsPage extends StatelessWidget {
               elevation: 2,
               color: Colors.white,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
+                borderRadius: BorderRadius.circular(12),
+              ),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
@@ -202,34 +206,73 @@ class DisposeDetailsPage extends StatelessWidget {
                   children: [
                     const Text(
                       "Nearby Disposal Centers",
-                      style:
-                      TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     const SizedBox(height: 12),
 
-                    // Placeholder for mini map
-                    Container(
-                      height: 100,
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade300,
+                    // 🗺️ Mini FlutterMap
+                    SizedBox(
+                      height: 150,
+                      child: ClipRRect(
                         borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: const Center(
-                        child: Icon(Icons.map, size: 40, color: Colors.grey),
+                        child: FlutterMap(
+                          options: MapOptions(
+                            initialCenter: LatLng(7.0731, 125.6131), // Default Davao coords
+                            initialZoom: 14,
+                          ),
+                          children: [
+                            TileLayer(
+                              urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+                              subdomains: const ['a', 'b', 'c'],
+                            ),
+                            MarkerLayer(
+                              markers: [
+                                Marker(
+                                  point: LatLng(7.0731, 125.6131),
+                                  width: 40,
+                                  height: 40,
+                                  child: const Icon(Icons.location_on,
+                                      color: Color(0xFF10B981), size: 36),
+                                ),
+                                Marker(
+                                  point: LatLng(7.0700, 125.6200),
+                                  width: 40,
+                                  height: 40,
+                                  child: const Icon(Icons.location_on,
+                                      color: Color(0xFF10B981), size: 36),
+                                ),
+                                Marker(
+                                  point: LatLng(7.0650, 125.6220),
+                                  width: 40,
+                                  height: 40,
+                                  child: const Icon(Icons.location_on,
+                                      color: Color(0xFF10B981), size: 36),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
+
                     const SizedBox(height: 12),
 
-                    // Example centers
+                    // Example centers (kept as-is)
                     const _CenterItem(
-                        name: "EcoCenter Downtown",
-                        details: "Open until 6 PM • 0.5 mi"),
+                      name: "EcoCenter Downtown",
+                      details: "Open until 6 PM • 0.5 mi",
+                    ),
                     const _CenterItem(
-                        name: "GreenTech Recycling",
-                        details: "Open until 9 PM • 1.2 mi"),
+                      name: "GreenTech Recycling",
+                      details: "Open until 9 PM • 1.2 mi",
+                    ),
                     const _CenterItem(
-                        name: "City Waste Management",
-                        details: "Open until 5 PM • 2.1 mi"),
+                      name: "City Waste Management",
+                      details: "Open until 5 PM • 2.1 mi",
+                    ),
 
                     const SizedBox(height: 12),
 
@@ -237,7 +280,12 @@ class DisposeDetailsPage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            // Demo: Directions to first center
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text("Opening directions to EcoCenter Downtown...")),
+                            );
+                          },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFF10B981),
                             shape: RoundedRectangleBorder(
@@ -251,7 +299,10 @@ class DisposeDetailsPage extends StatelessWidget {
                         ),
                         const SizedBox(height: 6),
                         OutlinedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            mainPageKey.currentState?.navigateTo(3); // go to Locations tab
+                            Navigator.pop(context); // close current details page
+                          },
                           style: OutlinedButton.styleFrom(
                             side: const BorderSide(color: Color(0xFF10B981)),
                             shape: RoundedRectangleBorder(
@@ -263,14 +314,14 @@ class DisposeDetailsPage extends StatelessWidget {
                             style: TextStyle(color: Color(0xFF10B981)),
                           ),
                         ),
+
                       ],
                     ),
-
-
                   ],
                 ),
               ),
             ),
+
 
             const SizedBox(height: 20),
 
